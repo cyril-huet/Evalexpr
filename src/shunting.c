@@ -29,14 +29,14 @@ struct output *shunting_yard(char *expr)
 
         if (get_priority(expr[i]))
         {
-            while (ops != NULL && ops->op != '('
-                   && (get_priority(ops->op) > get_priority(expr[i])
-                       || (get_priority(ops->op) == get_priority(expr[i])
+            while (ops != NULL && ops->operation != '('
+                   && (get_priority(ops->operation) > get_priority(expr[i])
+                       || (get_priority(ops->operation) == get_priority(expr[i])
                            && expr[i] != '^')))
             {
                 char op;
                 ops = pop_stack(ops, &op);
-                out = push_output_op(out, op);
+                out = push_output_operation(out, op);
             }
 
             ops = push_stack(ops, expr[i]);
@@ -55,10 +55,10 @@ struct output *shunting_yard(char *expr)
         {
             char op;
 
-            while (ops != NULL && ops->op != '(')
+            while (ops != NULL && ops->operation != '(')
             {
                 ops = pop_stack(ops, &op);
-                out = push_output_op(out, op);
+                out = push_output_operation(out, op);
             }
 
             if (ops == NULL)
@@ -78,13 +78,13 @@ struct output *shunting_yard(char *expr)
     {
         char op;
 
-        if (ops->op == '(')
+        if (ops->operation == '(')
         {
             exit(2);
         }
 
         ops = pop_stack(ops, &op);
-        out = push_output_op(out, op);
+        out = push_output_operation(out, op);
     }
 
     return out;

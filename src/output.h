@@ -5,12 +5,12 @@ struct output
 {
     int value;
     int is_number;
-    char op;
+    char operation;
     struct output *next;
 };
 
-struct output *push_output_number(struct output *out, int value);
-struct output *push_output_op(struct output *out, char op);
-void free_output(struct output *out);
+struct output *push_output_number(struct output *output, int value);
+struct output *push_output_operation(struct output *output, char operation);
+void free_output(struct output *output);
 
-#endif
+#endif /* ! OUTPUT_H */

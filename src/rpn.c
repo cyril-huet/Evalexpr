@@ -82,7 +82,7 @@ int evaluate_rpn(struct output *out)
             res = pop_result(res, &b);
             res = pop_result(res, &a);
 
-            res = push_result(res, apply_op(a, b, cur->op));
+            res = push_result(res, apply_op(a, b, cur->operation));
         }
 
         struct output *tmp = cur;

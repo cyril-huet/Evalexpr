@@ -2,49 +2,48 @@
 
 #include <stdlib.h>
 
-/* free output list */
-void free_output(struct output *out)
+struct output *push_output_number(struct output *output, int value)
 {
-    while (out != NULL)
-    {
-        struct output *tmp = out;
-        out = out->next;
-        free(tmp);
-    }
-}
+    struct output *new_output = malloc(sizeof(struct output));
 
-/* push number */
-struct output *push_output_number(struct output *out, int value)
-{
-    struct output *node = malloc(sizeof(struct output));
-
-    if (node == NULL)
+    if (new_output == NULL)
     {
         return NULL;
     }
 
-    node->value = value;
-    node->is_number = 1;
-    node->op = 0;
-    node->next = out;
+    new_output->value = value;
+    new_output->is_number = 1;
+    new_output->operation = '\0';
+    new_output->next = output;
 
-    return node;
+    return new_output;
 }
 
-/* push operator */
-struct output *push_output_op(struct output *out, char op)
+struct output *push_output_operation(struct output *output, char operation)
 {
-    struct output *node = malloc(sizeof(struct output));
+    struct output *new_output = malloc(sizeof(struct output));
 
-    if (node == NULL)
+    if (new_output == NULL)
     {
         return NULL;
     }
 
-    node->value = 0;
-    node->is_number = 0;
-    node->op = op;
-    node->next = out;
+    new_output->value = 0;
+    new_output->is_number = 0;
+    new_output->operation = operation;
+    new_output->next = output;
 
-    return node;
+    return new_output;
+}
+
+void free_output(struct output *output)
+{
+    struct output *next_output;
+
+    while (output != NULL)
+    {
+        next_output = output->next;
+        free(output);
+        output = next_output;
+    }
 }
