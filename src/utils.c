@@ -2,10 +2,9 @@
 
 #include <stdlib.h>
 
-/* check digit */
-int is_digit(char c)
+int is_digit(char character)
 {
-    if (c >= '0' && c <= '9')
+    if (character >= '0' && character <= '9')
     {
         return 1;
     }
@@ -13,20 +12,19 @@ int is_digit(char c)
     return 0;
 }
 
-/* operator priority */
-int get_priority(char op)
+int get_priority(char operation)
 {
-    if (op == '+' || op == '-')
+    if (operation == '+' || operation == '-')
     {
         return 1;
     }
 
-    if (op == '*' || op == '/' || op == '%')
+    if (operation == '*' || operation == '/' || operation == '%')
     {
         return 2;
     }
 
-    if (op == '^')
+    if (operation == '^')
     {
         return 3;
     }
@@ -34,38 +32,42 @@ int get_priority(char op)
     return 0;
 }
 
-/* power */
-int my_pow(int base, int exp)
+int my_pow(int base, int exponent)
 {
-    if (exp < 0)
+    int result = 1;
+    int index = 0;
+
+    if (exponent < 0)
     {
         exit(3);
     }
 
-    if (exp == 0)
+    for (index = 0; index < exponent; index++)
     {
-        return 1;
+        result = result * base;
     }
 
-    if (exp % 2 == 0)
-    {
-        int tmp = my_pow(base, exp / 2);
-        return tmp * tmp;
-    }
-
-    return base * my_pow(base, exp - 1);
+    return result;
 }
 
-/* detect number (with unary +/-) */
-int is_number_start(char *expr, int i)
+int is_number_start(char *expression, int index)
 {
-    if (is_digit(expr[i]))
+    if (is_digit(expression[index]) == 1)
     {
         return 1;
     }
 
-    if ((expr[i] == '+' || expr[i] == '-')
-        && (i == 0 || expr[i - 1] == '(' || get_priority(expr[i - 1])))
+    if (expression[index] != '+' && expression[index] != '-')
+    {
+        return 0;
+    }
+
+    if (index == 0 || expression[index - 1] == '(')
+    {
+        return 1;
+    }
+
+    if (get_priority(expression[index - 1]) != 0)
     {
         return 1;
     }
@@ -73,25 +75,25 @@ int is_number_start(char *expr, int i)
     return 0;
 }
 
-/* read full number */
-int read_number(char *expr, int *i)
+int read_number(char *expression, int *index)
 {
     int sign = 1;
     int value = 0;
 
-    while (expr[*i] == '+' || expr[*i] == '-')
+    while (expression[*index] == '+' || expression[*index] == '-')
     {
-        if (expr[*i] == '-')
+        if (expression[*index] == '-')
         {
-            sign *= -1;
+            sign = sign * -1;
         }
-        (*i)++;
+
+        *index = *index + 1;
     }
 
-    while (is_digit(expr[*i]))
+    while (is_digit(expression[*index]) == 1)
     {
-        value = value * 10 + (expr[*i] - '0');
-        (*i)++;
+        value = value * 10 + expression[*index] - '0';
+        *index = *index + 1;
     }
 
     return value * sign;
