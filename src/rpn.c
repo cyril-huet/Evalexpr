@@ -4,94 +4,134 @@
 #include "result.h"
 #include "utils.h"
 
-/* apply operation */
-static int apply_op(int a, int b, char op)
+static int apply_operation(int left, int right, char operation)
 {
-    if (op == '+')
+    if (operation == '+')
     {
-        return a + b;
-    }
-    if (op == '-')
-    {
-        return a - b;
-    }
-    if (op == '*')
-    {
-        return a * b;
+        return left + right;
     }
 
-    if (op == '/')
+    if (operation == '-')
     {
-        if (b == 0)
+        return left - right;
+    }
+
+    if (operation == '*')
+    {
+        return left * right;
+    }
+
+    if (operation == '/')
+    {
+        if (right == 0)
         {
             exit(3);
         }
-        return a / b;
+
+        return left / right;
     }
 
-    if (op == '%')
+    if (operation == '%')
     {
-        if (b == 0)
+        if (right == 0)
         {
             exit(3);
         }
-        return a % b;
+
+        return left % right;
     }
 
-    if (op == '^')
+    if (operation == '^')
     {
-        return my_pow(a, b);
+        return my_pow(left, right);
     }
 
-    return 0;
+    exit(1);
 }
 
-/* reverse list */
-static struct output *reverse(struct output *out)
+static struct output *reverse_output(struct output *output)
 {
-    struct output *prev = NULL;
+    struct output *previous = NULL;
+    struct output *next_output;
 
-    while (out != NULL)
+    while (output != NULL)
     {
-        struct output *next = out->next;
-        out->next = prev;
-        prev = out;
-        out = next;
+        next_output = output->next;
+        output->next = previous;
+        previous = output;
+        output = next_output;
     }
 
-    return prev;
+    return previous;
 }
 
-/* evaluate RPN */
-int evaluate_rpn(struct output *out)
+static void push_value(struct result **results, int value)
 {
-    struct result *res = NULL;
-    struct output *cur = reverse(out);
+    struct result *new_results = push_result(*results, value);
 
-    while (cur != NULL)
+    if (new_results == NULL)
     {
-        if (cur->is_number)
+        free_result(*results);
+        exit(4);
+    }
+
+    *results = new_results;
+}
+
+static void apply_result(struct result **results, char operation)
+{
+    int right;
+    int left;
+    int value;
+
+    if (*results == NULL)
+    {
+        exit(1);
+    }
+
+    *results = pop_result(*results, &right);
+
+    if (*results == NULL)
+    {
+        exit(1);
+    }
+
+    *results = pop_result(*results, &left);
+    value = apply_operation(left, right, operation);
+    push_value(results, value);
+}
+
+int evaluate_rpn(struct output *output)
+{
+    struct result *results = NULL;
+    struct output *current_output;
+    int final_value;
+
+    output = reverse_output(output);
+
+    while (output != NULL)
+    {
+        current_output = output;
+        output = output->next;
+
+        if (current_output->is_number == 1)
         {
-            res = push_result(res, cur->value);
+            push_value(&results, current_output->value);
         }
         else
         {
-            int b;
-            int a;
-
-            res = pop_result(res, &b);
-            res = pop_result(res, &a);
-
-            res = push_result(res, apply_op(a, b, cur->operation));
+            apply_result(&results, current_output->operation);
         }
 
-        struct output *tmp = cur;
-        cur = cur->next;
-        free(tmp);
+        free(current_output);
     }
 
-    int final;
-    res = pop_result(res, &final);
+    if (results == NULL || results->next != NULL)
+    {
+        free_result(results);
+        exit(1);
+    }
 
-    return final;
+    results = pop_result(results, &final_value);
+    return final_value;
 }
