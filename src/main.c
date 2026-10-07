@@ -60,8 +60,15 @@ int main(int argc, char **argv)
         return 4;
     }
 
-    output = parse_expression(expression);
-    result = evaluate_rpn(output);
+    if (argc == 2)
+    {
+        result = evaluate_rpn_text(expression);
+    }
+    else
+    {
+        output = parse_expression(expression);
+        result = evaluate_rpn(output);
+    }
 
     printf("%d\n", result);
     return 0;

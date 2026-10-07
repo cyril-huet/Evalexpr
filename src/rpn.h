@@ -4,5 +4,6 @@
 struct output;
 
 int evaluate_rpn(struct output *output);
+int evaluate_rpn_text(char *expression);
 
 #endif /* ! RPN_H */
