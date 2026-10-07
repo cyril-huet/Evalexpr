@@ -3,12 +3,12 @@
 
 struct stack
 {
-    char op;
+    char operation;
     struct stack *next;
 };
 
-struct stack *push_stack(struct stack *stack, char op);
-struct stack *pop_stack(struct stack *stack, char *op);
+struct stack *push_stack(struct stack *stack, char operation);
+struct stack *pop_stack(struct stack *stack, char *operation);
 void free_stack(struct stack *stack);
 
-#endif
+#endif /* ! STACK_H */

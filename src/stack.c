@@ -2,47 +2,45 @@
 
 #include <stdlib.h>
 
-/* free stack */
-void free_stack(struct stack *stack)
+struct stack *push_stack(struct stack *stack, char operation)
 {
-    while (stack != NULL)
-    {
-        struct stack *tmp = stack;
-        stack = stack->next;
-        free(tmp);
-    }
-}
+    struct stack *new_node = malloc(sizeof(struct stack));
 
-/* push operator */
-struct stack *push_stack(struct stack *stack, char op)
-{
-    struct stack *node = malloc(sizeof(struct stack));
-
-    if (node == NULL)
+    if (new_node == NULL)
     {
         return NULL;
     }
 
-    node->op = op;
-    node->next = stack;
+    new_node->operation = operation;
+    new_node->next = stack;
 
-    return node;
+    return new_node;
 }
 
-/* pop operator */
-struct stack *pop_stack(struct stack *stack, char *op)
+struct stack *pop_stack(struct stack *stack, char *operation)
 {
-    struct stack *next;
+    struct stack *next_node;
 
     if (stack == NULL)
     {
         return NULL;
     }
 
-    *op = stack->op;
-    next = stack->next;
-
+    *operation = stack->operation;
+    next_node = stack->next;
     free(stack);
 
-    return next;
+    return next_node;
+}
+
+void free_stack(struct stack *stack)
+{
+    struct stack *next_node;
+
+    while (stack != NULL)
+    {
+        next_node = stack->next;
+        free(stack);
+        stack = next_node;
+    }
 }
