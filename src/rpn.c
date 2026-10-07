@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include "output.h"
 #include "result.h"
 #include "utils.h"
@@ -6,19 +7,34 @@
 /* apply operation */
 static int apply_op(int a, int b, char op)
 {
-    if (op == '+') { return a + b; }
-    if (op == '-') { return a - b; }
-    if (op == '*') { return a * b; }
+    if (op == '+')
+    {
+        return a + b;
+    }
+    if (op == '-')
+    {
+        return a - b;
+    }
+    if (op == '*')
+    {
+        return a * b;
+    }
 
     if (op == '/')
     {
-        if (b == 0) { exit(3); }
+        if (b == 0)
+        {
+            exit(3);
+        }
         return a / b;
     }
 
     if (op == '%')
     {
-        if (b == 0) { exit(3); }
+        if (b == 0)
+        {
+            exit(3);
+        }
         return a % b;
     }
 

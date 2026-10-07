@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include "utils.h"
+
+#include <stdlib.h>
 
 /* check digit */
 int is_digit(char c)

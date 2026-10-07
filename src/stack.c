@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include "stack.h"
+
+#include <stdlib.h>
 
 /* free stack */
 void free_stack(struct stack *stack)

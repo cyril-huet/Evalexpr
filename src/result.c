@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include "result.h"
+
+#include <stdlib.h>
 
 /* free result stack */
 void free_result(struct result *res)

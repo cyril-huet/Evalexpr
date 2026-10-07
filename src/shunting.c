@@ -1,8 +1,9 @@
 #include <stdlib.h>
-#include "stack.h"
+
 #include "output.h"
-#include "utils.h"
 #include "result.h"
+#include "stack.h"
+#include "utils.h"
 
 /* shunting yard */
 struct output *shunting_yard(char *expr)
@@ -28,9 +29,10 @@ struct output *shunting_yard(char *expr)
 
         if (get_priority(expr[i]))
         {
-            while (ops != NULL && ops->op != '(' &&
-                  (get_priority(ops->op) > get_priority(expr[i]) ||
-                  (get_priority(ops->op) == get_priority(expr[i]) && expr[i] != '^')))
+            while (ops != NULL && ops->op != '('
+                   && (get_priority(ops->op) > get_priority(expr[i])
+                       || (get_priority(ops->op) == get_priority(expr[i])
+                           && expr[i] != '^')))
             {
                 char op;
                 ops = pop_stack(ops, &op);

@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include "output.h"
+
+#include <stdlib.h>
 
 /* free output list */
 void free_output(struct output *out)

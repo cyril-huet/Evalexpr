@@ -1,22 +1,46 @@
-CC = gcc
-CFLAGS = -std=c99 -pedantic -Werror -Wall -Wextra -Wvla
-
+CC = cc
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -Werror -Wvla
 TARGET = evalexpr
 
-SRC = src/main.c src/stack.c src/output.c src/result.c src/utils.c src/rpn.c src/shunting.c
+
+# Source files
+SRC = src/main.c \
+      src/stack.c \
+      src/output.c \
+      src/result.c \
+      src/utils.c \
+      src/rpn.c \
+      src/shunting.c
+
+# Header files
+HEADERS = src/output.h \
+          src/result.h \
+          src/stack.h \
+          src/utils.h
+
+# Object files
 OBJ = $(SRC:.c=.o)
 
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET)
 
-# règle pour compiler les .c en .o
-src/%.o: src/%.c
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-check: all
+check: $(TARGET)
 	./tests/test.sh
 
+format:
+	clang-format -i $(SRC) $(HEADERS)
+
+check-format:
+	clang-format --dry-run -Werror $(SRC) $(HEADERS)
+
 clean:
-	$(RM) $(OBJ) $(TARGET)
+	rm -f $(OBJ) $(TARGET)
+
+re: fclean all
+
+.PHONY: all check format check-format clean fclean re
