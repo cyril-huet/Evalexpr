@@ -2,47 +2,45 @@
 
 #include <stdlib.h>
 
-/* free result stack */
-void free_result(struct result *res)
+struct result *push_result(struct result *result, int value)
 {
-    while (res != NULL)
-    {
-        struct result *tmp = res;
-        res = res->next;
-        free(tmp);
-    }
-}
+    struct result *new_result = malloc(sizeof(struct result));
 
-/* push value */
-struct result *push_result(struct result *res, int value)
-{
-    struct result *node = malloc(sizeof(struct result));
-
-    if (node == NULL)
+    if (new_result == NULL)
     {
         return NULL;
     }
 
-    node->value = value;
-    node->next = res;
+    new_result->value = value;
+    new_result->next = result;
 
-    return node;
+    return new_result;
 }
 
-/* pop value */
-struct result *pop_result(struct result *res, int *value)
+struct result *pop_result(struct result *result, int *value)
 {
-    struct result *next;
+    struct result *next_result;
 
-    if (res == NULL)
+    if (result == NULL)
     {
         return NULL;
     }
 
-    *value = res->value;
-    next = res->next;
+    *value = result->value;
+    next_result = result->next;
+    free(result);
 
-    free(res);
+    return next_result;
+}
 
-    return next;
+void free_result(struct result *result)
+{
+    struct result *next_result;
+
+    while (result != NULL)
+    {
+        next_result = result->next;
+        free(result);
+        result = next_result;
+    }
 }
