@@ -1,8 +1,8 @@
-#include "parser.h"
-#include "rpn.h"
-
 #include <stdio.h>
 #include <string.h>
+
+#include "parser.h"
+#include "rpn.h"
 
 static int valid_arguments(int argc, char **argv)
 {
@@ -23,8 +23,7 @@ static int read_input(char *buffer, size_t capacity)
 {
     size_t length = 0;
 
-    while (length < capacity - 1
-           && fread(&buffer[length], 1, 1, stdin) > 0)
+    while (length < capacity - 1 && fread(&buffer[length], 1, 1, stdin) > 0)
     {
         length++;
     }
@@ -61,7 +60,7 @@ int main(int argc, char **argv)
         return 4;
     }
 
-    output = shunting_yard(expression);
+    output = parse_expression(expression);
     result = evaluate_rpn(output);
 
     printf("%d\n", result);

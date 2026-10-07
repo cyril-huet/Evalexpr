@@ -3,6 +3,6 @@
 
 struct output;
 
-struct output *shunting_yard(char *expression);
+struct output *parse_expression(char *expression);
 
 #endif /* ! PARSER_H */

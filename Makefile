@@ -10,7 +10,7 @@ SRC = src/main.c \
       src/result.c \
       src/utils.c \
       src/rpn.c \
-      src/shunting.c
+      src/parser.c
 
 # Header files
 HEADERS = src/output.h \

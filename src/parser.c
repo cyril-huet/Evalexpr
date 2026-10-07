@@ -1,9 +1,10 @@
-#include "output.h"
-#include "stack.h"
-#include "utils.h"
 #include "parser.h"
 
 #include <stdlib.h>
+
+#include "output.h"
+#include "stack.h"
+#include "utils.h"
 
 static void add_number(struct output **output, int value)
 {
@@ -20,8 +21,7 @@ static void add_number(struct output **output, int value)
 
 static void add_operation(struct output **output, char operation)
 {
-    struct output *new_output =
-        push_output_operation(*output, operation);
+    struct output *new_output = push_output_operation(*output, operation);
 
     if (new_output == NULL)
     {
@@ -46,27 +46,24 @@ static void push_operation(struct stack **operations, char operation)
 }
 
 static void empty_until_parenthesis(struct stack **operations,
-                                     struct output **output)
+                                    struct output **output)
 {
     char operation;
 
-    while (*operations != NULL
-           && (*operations)->operation != '(')
+    while (*operations != NULL && (*operations)->operation != '(')
     {
         *operations = pop_stack(*operations, &operation);
         add_operation(output, operation);
     }
 }
 
-static void handle_operator(struct stack **operations,
-                            struct output **output, char operation)
+static void handle_operator(struct stack **operations, struct output **output,
+                            char operation)
 {
     char previous_operation;
 
-    while (*operations != NULL
-           && (*operations)->operation != '('
-           && (get_priority((*operations)->operation)
-                   > get_priority(operation)
+    while (*operations != NULL && (*operations)->operation != '('
+           && (get_priority((*operations)->operation) > get_priority(operation)
                || (get_priority((*operations)->operation)
                        == get_priority(operation)
                    && operation != '^')))
@@ -78,8 +75,7 @@ static void handle_operator(struct stack **operations,
     push_operation(operations, operation);
 }
 
-static void finish_operations(struct stack **operations,
-                              struct output **output)
+static void finish_operations(struct stack **operations, struct output **output)
 {
     char operation;
 
@@ -97,7 +93,7 @@ static void finish_operations(struct stack **operations,
     }
 }
 
-struct output *shunting_yard(char *expression)
+struct output *parse_expression(char *expression)
 {
     struct stack *operations = NULL;
     struct output *output = NULL;
