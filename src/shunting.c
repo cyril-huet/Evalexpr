@@ -1,6 +1,7 @@
 #include "output.h"
 #include "stack.h"
 #include "utils.h"
+#include "parser.h"
 
 #include <stdlib.h>
 

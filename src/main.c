@@ -1,51 +1,69 @@
+#include "parser.h"
+#include "rpn.h"
+
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-struct output *shunting_yard(char *expr);
-int evaluate_rpn(struct output *out);
-
-int main(int argc, char *argv[])
+static int valid_arguments(int argc, char **argv)
 {
-    if (argc > 2)
+    if (argc == 1)
+    {
+        return 1;
+    }
+
+    if (argc == 2 && strcmp(argv[1], "-rpn") == 0)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+static int read_input(char *buffer, size_t capacity)
+{
+    size_t length = 0;
+
+    while (length < capacity - 1
+           && fread(&buffer[length], 1, 1, stdin) > 0)
+    {
+        length++;
+    }
+
+    buffer[length] = '\0';
+
+    if (length > 0 && buffer[length - 1] == '\n')
+    {
+        buffer[length - 1] = '\0';
+        length--;
+    }
+
+    if (length > 0 && buffer[length - 1] == '\r')
+    {
+        buffer[length - 1] = '\0';
+    }
+
+    return length != 0;
+}
+
+int main(int argc, char **argv)
+{
+    char expression[1024];
+    struct output *output;
+    int result;
+
+    if (valid_arguments(argc, argv) == 0)
     {
         return 4;
     }
 
-    if (argc == 2 && strcmp(argv[1], "-rpn") != 0)
+    if (read_input(expression, sizeof(expression)) == 0)
     {
         return 4;
     }
 
-    char buffer[1024];
-    size_t i = 0;
-
-    while (i < sizeof(buffer) - 1 && fread(&buffer[i], 1, 1, stdin) > 0)
-    {
-        i++;
-    }
-
-    buffer[i] = '\0';
-
-    if (i == 0)
-    {
-        return 4;
-    }
-
-    if (buffer[i - 1] == '\n')
-    {
-        buffer[i - 1] = '\0';
-    }
-
-    if (buffer[0] == '\0')
-    {
-        return 0;
-    }
-
-    struct output *out = shunting_yard(buffer);
-    int result = evaluate_rpn(out);
+    output = shunting_yard(expression);
+    result = evaluate_rpn(output);
 
     printf("%d\n", result);
-
     return 0;
 }

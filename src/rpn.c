@@ -3,6 +3,7 @@
 #include "output.h"
 #include "result.h"
 #include "utils.h"
+#include "rpn.h"
 
 static int apply_operation(int left, int right, char operation)
 {
