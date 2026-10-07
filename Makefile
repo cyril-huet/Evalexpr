@@ -5,17 +5,20 @@ TARGET = evalexpr
 
 # Source files
 SRC = src/main.c \
+      src/parser.c \
+      src/rpn.c \
       src/stack.c \
       src/output.c \
       src/result.c \
-      src/utils.c \
-      src/rpn.c \
-      src/parser.c
+      src/utils.c
 
-# Header files
-HEADERS = src/output.h \
-          src/result.h \
+OBJ = $(SRC:.c=.o)
+
+HEADERS = src/parser.h \
+          src/rpn.h \
           src/stack.h \
+          src/output.h \
+          src/result.h \
           src/utils.h
 
 # Object files
