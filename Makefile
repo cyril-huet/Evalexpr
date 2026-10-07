@@ -34,6 +34,7 @@ $(TARGET): $(OBJ)
 
 check: $(TARGET)
 	./tests/test.sh
+	./tests/test_rpn.sh
 
 format:
 	clang-format -i $(SRC) $(HEADERS)
