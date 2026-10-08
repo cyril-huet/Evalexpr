@@ -1,0 +1,25 @@
+name: Evalexpr tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer clang-format
+        run: sudo apt-get update && sudo apt-get install -y clang-format
+
+      - name: Compiler le projet
+        run: make
+
+      - name: Vérifier le format
+        run: make check-format
+
+      - name: Lancer les tests
+        run: make check
