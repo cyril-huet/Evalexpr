@@ -12,8 +12,6 @@ SRC = src/main.c \
       src/result.c \
       src/utils.c
 
-OBJ = $(SRC:.c=.o)
-
 HEADERS = src/parser.h \
           src/rpn.h \
           src/stack.h \
@@ -42,8 +40,11 @@ check-format:
 	clang-format --dry-run -Werror $(SRC) $(HEADERS)
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -f $(OBJ)
 
-re: clean all
+fclean: clean
+	rm -f $(TARGET)
+
+re: fclean all
 
 .PHONY: all check format check-format clean fclean re
