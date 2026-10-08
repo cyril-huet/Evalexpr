@@ -46,6 +46,6 @@ check-format:
 clean:
 	rm -f $(OBJ) $(TARGET)
 
-re: fclean all
+re: clean all
 
 .PHONY: all check format check-format clean fclean re

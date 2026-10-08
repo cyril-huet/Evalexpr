@@ -1,127 +1,115 @@
 #!/bin/sh
 
-BIN=./evalexpr
-PASS=0
-TOTAL=0
+PASSED=0
+FAILED=0
 
-test_ok()
-{
-    TOTAL=$((TOTAL+1))
-    INPUT="$1"
-    EXPECT="$2"
-
-    RESULT=$(echo "$INPUT" | $BIN 2>/dev/null)
-
-    if [ "$RESULT" = "$EXPECT" ]; then
-        echo "✅ OK: $INPUT = $EXPECT"
-        PASS=$((PASS+1))
-    else
-        echo "❌ FAIL: $INPUT → got [$RESULT] expected [$EXPECT]"
-    fi
-}
-
-test_rpn()
-{
-    TOTAL=$((TOTAL+1))
-    INPUT="$1"
-    EXPECT="$2"
-
-    RESULT=$(echo "$INPUT" | $BIN -rpn 2>/dev/null)
-
-    if [ "$RESULT" = "$EXPECT" ]; then
-        echo "✅ OK RPN: $INPUT = $EXPECT"
-        PASS=$((PASS+1))
-    else
-        echo "❌ FAIL RPN: $INPUT → got [$RESULT] expected [$EXPECT]"
-    fi
-}
-
-test_err()
-{
-    TOTAL=$((TOTAL+1))
-    INPUT="$1"
-
-    echo "$INPUT" | $BIN >/dev/null 2>&1
-    CODE=$?
-
-    if [ "$CODE" -ne 0 ]; then
-        echo "✅ ERR OK: $INPUT (code $CODE)"
-        PASS=$((PASS+1))
-    else
-        echo "❌ FAIL ERR: $INPUT should fail"
-    fi
-}
-
-echo "===== BASIC ====="
-test_ok "1+1" "2"
-test_ok "2*3" "6"
-test_ok "10-4" "6"
-test_ok "8/2" "4"
-test_ok "9%2" "1"
-
-echo "===== PRIORITY ====="
-test_ok "2+3*4" "14"
-test_ok "2*3+4" "10"
-test_ok "2*3+4*5" "26"
-test_ok "2+3*4+5" "19"
-
-echo "===== PARENTHESES ====="
-test_ok "(2+3)*4" "20"
-test_ok "2*(3+4)" "14"
-test_ok "(2+3)*(4+5)" "45"
-test_ok "((2+3))" "5"
-
-echo "===== POWER ====="
-test_ok "2^3" "8"
-test_ok "2^3^2" "512"
-test_ok "(2^3)^2" "64"
-
-echo "===== UNARY ====="
-test_ok "-1+2" "1"
-test_ok "--1" "1"
-test_ok "---1" "-1"
-test_ok "5*-2" "-10"
-test_ok "5*--2" "10"
-test_ok "86*--1" "86"
-
-echo "===== MIXED ====="
-test_ok "5*(2^2+3)" "35"
-test_ok "10+2*3^2" "28"
-test_ok "100/(5*5)" "4"
-test_ok "7+8*2-3" "20"
-
-echo "===== BIG ====="
-test_ok "1000+2000" "3000"
-test_ok "999*0" "0"
-test_ok "12345+67890" "80235"
-
-echo "===== RPN ====="
-test_rpn "1 1 +" "2"
-test_rpn "2 3 *" "6"
-test_rpn "5 2 2 ^ 3 + *" "35"
-test_rpn "10 2 /" "5"
-test_rpn "2 3 4 * +" "14"
-
-echo "===== ERRORS ====="
-test_err "1/0"
-test_err "1%0"
-test_err "(1+2"
-test_err "1+2)"
-test_err "abc"
-test_err "2++2"
-test_err "*2+3"
-
-echo "===== EDGE ====="
-test_ok "0" "0"
-test_ok "0001" "1"
-test_ok "1+0" "1"
-test_ok "0*999" "0"
-
-echo "===== RESULT ====="
-echo "$PASS / $TOTAL tests passed"
-
-if [ "$PASS" -eq "$TOTAL" ]; then
-    echo "ALL TESTS PASSED 🎉"
+if [ -t 1 ]; then
+    GREEN=$(printf '\033[32m')
+    RED=$(printf '\033[31m')
+    BLUE=$(printf '\033[34m')
+    RESET=$(printf '\033[0m')
 else
-    echo "⚠️ SOME TESTS FAILED ⚠️ "
+    GREEN=""
+    RED=""
+    BLUE=""
+    RESET=""
+fi
+
+test_value()
+{
+    label="$1"
+    expected="$2"
+    expression="$3"
+    mode="$4"
+
+    if [ "$mode" = "rpn" ]; then
+        result=$(printf "%s\n" "$expression" | ./evalexpr -rpn)
+    else
+        result=$(printf "%s\n" "$expression" | ./evalexpr)
+    fi
+
+    status=$?
+
+    if [ "$status" -eq 0 ] && [ "$result" = "$expected" ]; then
+        printf "  %s[OK]%s   %s\n" "$GREEN" "$RESET" "$label"
+        printf "          %s -> %s\n" "$expression" "$result"
+        PASSED=$((PASSED + 1))
+    else
+        printf "  %s[FAIL]%s %s\n" "$RED" "$RESET" "$label"
+        printf "          expression : %s\n" "$expression"
+        printf "          attendu    : %s\n" "$expected"
+        printf "          obtenu     : %s\n" "$result"
+        FAILED=$((FAILED + 1))
+    fi
+}
+
+test_error()
+{
+    label="$1"
+    expression="$2"
+    mode="$3"
+
+    if [ "$mode" = "rpn" ]; then
+        printf "%s\n" "$expression" | ./evalexpr -rpn >/dev/null 2>&1
+    else
+        printf "%s\n" "$expression" | ./evalexpr >/dev/null 2>&1
+    fi
+
+    status=$?
+
+    if [ "$status" -ne 0 ]; then
+        printf "  %s[OK]%s   %s\n" "$GREEN" "$RESET" "$label"
+        printf "          %s -> erreur détectée\n" "$expression"
+        PASSED=$((PASSED + 1))
+    else
+        printf "  %s[FAIL]%s %s\n" "$RED" "$RESET" "$label"
+        FAILED=$((FAILED + 1))
+    fi
+}
+
+test_invalid_argument()
+{
+    ./evalexpr --invalid >/dev/null 2>&1
+
+    if [ "$?" -ne 0 ]; then
+        printf "  %s[OK]%s   argument invalide\n" "$GREEN" "$RESET"
+        PASSED=$((PASSED + 1))
+    else
+        printf "  %s[FAIL]%s argument invalide\n" "$RED" "$RESET"
+        FAILED=$((FAILED + 1))
+    fi
+}
+
+printf "%s\n" "========================================"
+printf "       %sEvalexpr - tests%s\n" "$BLUE" "$RESET"
+printf "%s\n\n" "========================================"
+
+printf "%s\n" "--- Expressions classiques ---"
+test_value "addition" 2 "1 + 1" "infixe"
+test_value "priorité des opérations" 14 "2 + 3 * 4" "infixe"
+test_value "parenthèses" 20 "(2 + 3) * 4" "infixe"
+test_value "nombre négatif" -3 "-5 + 2" "infixe"
+test_value "modulo" 1 "10 % 3" "infixe"
+test_value "puissance" 8 "2 ^ 3" "infixe"
+
+printf "\n%s\n" "--- Expressions RPN ---"
+test_value "addition RPN" 2 "1 1 +" "rpn"
+test_value "plusieurs opérations" 14 "2 3 4 * +" "rpn"
+test_value "soustraction" 3 "5 2 -" "rpn"
+test_value "nombre négatif" -6 "-2 3 *" "rpn"
+test_value "puissance RPN" 8 "2 3 ^" "rpn"
+
+printf "\n%s\n" "--- Erreurs ---"
+test_error "expression incomplète" "1 +" "infixe"
+test_error "division par zéro" "1 0 /" "rpn"
+test_error "opérateur inconnu" "1 1 &" "rpn"
+test_invalid_argument
+
+printf "\n%s\n" "========================================"
+printf "Tests réussis : %s\n" "$PASSED"
+printf "Tests échoués : %s\n" "$FAILED"
+printf "%s\n" "========================================"
+
+if [ "$FAILED" -ne 0 ]; then
+    exit 1
 fi
