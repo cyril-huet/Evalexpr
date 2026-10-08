@@ -1,106 +1,197 @@
 # Evalexpr
 
-Evalexpr is a C program that reads an arithmetic expression from standard input
-and prints the result to standard output.
+[![CI](https://github.com/cyril-huet/Evalexpr/actions/workflows/ci.yml/badge.svg)](https://github.com/cyril-huet/Evalexpr/actions/workflows/ci.yml)
+![C](https://img.shields.io/badge/C-C99-blue.svg)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-The expression can be provided either in standard (infix) notation or in
-reverse polish notation (RPN). All computations are performed using integers.
+Evalexpr is a small command-line calculator written in C99.
 
-## Overview
+It evaluates arithmetic expressions written in the usual infix notation or in Reverse Polish Notation (RPN).
 
-This project focuses on parsing and evaluating arithmetic expressions while
-respecting operator precedence, associativity, and parentheses.
-
-It covers core concepts such as:
-- lexical analysis
-- expression parsing
-- stack-based evaluation
-- operator precedence and associativity
-- robust error handling
-
-The goal is to build a correct and reliable expression evaluator using only
-standard C and well-defined rules.
+This project was made as an educational exercise to practice parsing, stacks, operator priorities and error handling.
 
 ## Features
 
-- Support for **infix notation** (standard arithmetic expressions)
-- Support for **reverse polish notation** (`-rpn` option)
-- Integer-only arithmetic
-- Unary and binary operators
-- Proper operator precedence and associativity
-- Parentheses handling
-- Clear and consistent error codes
-
-### Supported operators
-
-- Addition: `+`
-- Subtraction: `-`
-- Multiplication: `*`
-- Division: `/`
-- Modulo: `%`
-- Exponentiation: `^`
-- Unary `+` and `-`
+- Addition, subtraction, multiplication and division
+- Modulo and power operators
+- Parentheses
+- Positive and negative numbers
+- Infix expressions
+- RPN expressions
+- Basic syntax error handling
+- Division-by-zero detection
+- Simple shell test suite
+- Automatic checks with GitHub Actions
 
 ## Build
 
-Build the project using `make`:
+Requirements:
+
+- A C99 compiler
+- `make`
+- `clang-format` for format checks
 
 ```sh
+git clone https://github.com/cyril-huet/Evalexpr.git
+cd Evalexpr
 make
 ```
 
-
-## The resulting binary will be located at
-```text
-./evalexpr
-```
-
-
+The executable is called `evalexpr`.
 
 ## Usage
-### Evaluate an infix expression
-```c
-echo "1 + 1" | ./evalexpr
+
+### Infix expressions
+
+```sh
+printf "1 + 1\n" | ./evalexpr
 ```
-### Output:
+
 ```text
 2
 ```
 
-### Evaluate an expression in reverse polish notation
-```c
-echo "1 1 +" | ./evalexpr -rpn
+```sh
+printf "(2 + 3) * 4\n" | ./evalexpr
 ```
-### Output:
+
+```text
+20
+```
+
+### RPN expressions
+
+Use the `-rpn` option:
+
+```sh
+printf "1 1 +\n" | ./evalexpr -rpn
+```
+
 ```text
 2
 ```
-### More examples
-#### 1)
-```c
-echo "5*(2^2+3)" | ./evalexpr
+
+```sh
+printf "2 3 4 * +\n" | ./evalexpr -rpn
 ```
-### Output:
+
 ```text
-35
+14
 ```
 
-#### 2)
-```c
-echo "5 2 2 ^ 3 + *" | ./evalexpr -rpn
-```
-### Output:
+## Operators
+
+| Operator | Description |
+|----------|-------------|
+| `+`      | Addition |
+| `-`      | Subtraction |
+| `*`      | Multiplication |
+| `/`      | Division |
+| `%`      | Modulo |
+| `^`      | Power |
+
+Parentheses and negative numbers are supported in infix mode.
+
+## Project structure
+
 ```text
-35
+.
+├── Makefile
+├── README.md
+├── LICENSE
+├── src/
+│   ├── main.c
+│   ├── parser.c
+│   ├── parser.h
+│   ├── rpn.c
+│   ├── rpn.h
+│   ├── stack.c
+│   ├── stack.h
+│   ├── output.c
+│   ├── output.h
+│   ├── result.c
+│   ├── result.h
+│   ├── utils.c
+│   └── utils.h
+├── tests/
+│   └── test.sh
+└── .github/
+    └── workflows/
+        └── ci.yml
 ```
 
+Each source file has a specific responsibility:
 
-# Tests
+- `main.c`: reads the input and prints the result
+- `parser.c`: converts infix expressions into RPN
+- `rpn.c`: evaluates RPN expressions
+- `stack.c`: manages the operator stack
+- `output.c`: manages parsed expression elements
+- `result.c`: manages calculation results
+- `utils.c`: contains small utility functions
 
-## The project includes a functional testsuite.
+## Tests
 
-### Run the tests with:
+Run the complete test suite:
+
 ```sh
 make check
 ```
 
+Check the code formatting:
+
+```sh
+make check-format
+```
+
+Format the source files:
+
+```sh
+make format
+```
+
+The tests cover:
+
+- Basic arithmetic
+- Operator priorities
+- Parentheses
+- Negative numbers
+- RPN expressions
+- Invalid expressions
+- Division by zero
+- Invalid command-line arguments
+
+## Error codes
+
+| Code | Meaning |
+|------|---------|
+| `0`  | Successful execution |
+| `1`  | Invalid expression |
+| `3`  | Arithmetic error |
+| `4`  | Invalid arguments or memory error |
+
+## Limitations
+
+Evalexpr is intentionally small. It does not currently support:
+
+- Floating-point numbers
+- Variables
+- Mathematical functions
+- Multiple expressions in one input
+- Advanced mathematical notation
+
+## Continuous integration
+
+GitHub Actions automatically runs the following checks:
+
+```sh
+make
+make check-format
+make check
+```
+
+## License
+
+This project is distributed under the MIT License.
+
+See the [LICENSE](LICENSE) file for more information.
